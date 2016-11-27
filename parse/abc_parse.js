@@ -31,6 +31,7 @@ window.ABCJS.parse.Parse = function() {
 		return tune;
 	};
 
+	//[HarmonyChecker] Parallel
 	var firstPart = 0;
 	var count = 1;
 	var tub =[];
@@ -39,9 +40,6 @@ window.ABCJS.parse.Parse = function() {
 	var tenor = [];
 	var bass = [];
 	
-	var test = [];
-	
-	//Parallel
 	var harmoChordPre = [];
 	var harmoIndexPre;
 	var linePre;
@@ -123,21 +121,11 @@ window.ABCJS.parse.Parse = function() {
 			default: break;
 		}
 	}
-	
-	var parallelHarmonyCheck = function(chord1,chord2){
-		var fchk = '0';
-		var ochk = '0';
-		var chr_num1 = Math.abs(noteNum(chord1[1]) - noteNum(chord1[2]));
-		var chr_num2 = Math.abs(noteNum(chord2[1]) - noteNum(chord2[2]));
-		
-		if(chr_num1 == chr_num2 && chr_num1 == 7)
-			fchk = '1';
-		if(chr_num1 == chr_num2 && chr_num2 == 12)
-			ochk = '1';
-		
-		return fchk + ochk;
-	}
 	//end Parallel
+	
+	//[HarmonyChecker] Chord Analyser TODO
+	var chordBank = [];
+	// end Chord Analyser
 	
 	function addPositioning(el, type, value) {
 		if (!el.positioning) el.positioning = {};
@@ -259,6 +247,7 @@ window.ABCJS.parse.Parse = function() {
 		if (line.charAt(i) === '"')
 		{
 			var chord = tokenizer.getBrackettedSubstring(line, i, 5);
+			chordBank.push(chord[1]);
 			if (!chord[2])
 				warn("Missing the closing quote while parsing the chord symbol", line , i);
 			// If it starts with ^, then the chord appears above.
@@ -1353,7 +1342,8 @@ window.ABCJS.parse.Parse = function() {
 						while (!done) {
 							var chordNote = getCoreNote(line, i, {}, false);
 							harmoChord.push(line.charAt(i));
-							//======== ======== ======== ======== ======== ======== tub ======== ======== ======== ======== ======== ========
+							
+							//[HarmonyChecker] add to tub
 							var tubNote = line.charAt(i);
 							var octaveCk = line.charAt(i+1);
 							if(tubNote != ']'){
@@ -1363,7 +1353,8 @@ window.ABCJS.parse.Parse = function() {
 								tub.push(tubNote);
 								//test.push(tune.getNumLines())
 							}
-							//======== ======== ======== ======== ======== ======== tub ======== ======== ======== ======== ======== ========
+							// add to tub end
+							
 							if (chordNote !== null) {
 								if (chordNote.end_beam) {
 									el.end_beam = true;
@@ -1483,23 +1474,6 @@ window.ABCJS.parse.Parse = function() {
 								done = true;
 							}
 						}
-						
-						//Harmony check
-						if(conChord == 2) {
-							var harmoChk= parallelHarmonyCheck(harmoChordPre,harmoChord);
-							//window.alert(harmoChk);
-							/*
-							if(harmoChk.charAt(0) == 1)
-								warnChord("Consecutive fifths found!",linePre,harmoIndexPre,harmoChordPre,harmoChord);
-							if(harmoChk.charAt(1) == 1) 
-								warnChord("Consecutive octave found!",linePre,harmoIndexPre,harmoChordPre,harmoChord);
-							*/
-						}
-						harmoChordPre = harmoChord;
-						harmoIndexPre = harmoIndex;
-						linePre = tune.getNumLines();
-						//
-						
 					} else {
 						conChord = 0;
 						
@@ -1594,9 +1568,11 @@ window.ABCJS.parse.Parse = function() {
 					}
 				}
 			}
-		}//tub
-		//window.alert(tub);
+		}
+		
+		//[HarmonyChecker] convert from tub to each line (SATB)
 		if(tub.length > 0){
+			document.getElementById("demo").innerHTML = tub;
 			
 			if(count == 1){
 				firstPart = tub.length;
@@ -1609,7 +1585,7 @@ window.ABCJS.parse.Parse = function() {
 						//console.log(tub[i] + " added to alto.");
 					}
 				}
-			}else if(count == 2){					
+			}else if(count == 2){			
 				for (var i = firstPart; i < tub.length; i++) {
 					if(i%2==0){
 						tenor.push(tub[i]);
@@ -1620,59 +1596,63 @@ window.ABCJS.parse.Parse = function() {
 					}
 				}
 				
-				//Tub Parallel Check here
-				for (var i = 0; i < soprano.length; i++) {
-					//bass tenor
-					if(noteNum(tenor[i]) - noteNum(bass[i]) == 7){
-						/***console.log("Fifth found [case 1] > " + bass[i] + " and " + tenor[i]);***/
-						if(noteNum(tenor[i+1]) - noteNum(bass[i+1]) == 7){
-							warnParallel(5, bass[i], tenor[i], bass[i+1], tenor[i+1],"B&T");
-						}
-					}else if(noteNum(tenor[i]) - noteNum(bass[i]) == 12){
-						if(noteNum(tenor[i+1]) - noteNum(bass[i+1]) == 12){
-							warnParallel(8, bass[i], tenor[i], bass[i+1], tenor[i+1],"B&T");
-						}
-					}
-					
-					//TODO apply to all these
-					//VVVVVVVVVVVVVVVVVV
-					//bass alto
-					//bass soprano
-					//tenor alto
-					//tenor soprano
-					//alto sopran		
-					
-				}
+				//[HarmonyChecker] Parallel Check all 6 pattern
+				checkParallel(bass,tenor);
+				checkParallel(bass,alto);
+				checkParallel(bass,soprano);
+				checkParallel(tenor,alto);
+				checkParallel(tenor,soprano);
+				checkParallel(alto,soprano);
 				
-				//testing HarmCheck
-				/*for (var i = 0; i < tub.length; i++){
-					console.log(noteNum(tub[i]));
-					if(noteNum(tub[i]) != null){
-						test.push(noteNum(tub[i]));
-					}
-				}*/
-				
-				/*console.log(soprano);
-				console.log(alto);
-				console.log(tenor);
-				console.log(bass);*/
 			}
 			
 			count++;
 			
-			
-			
-			//document.getElementById("demo2").innerHTML = harmoChord;
+			//for testing purpose by p'tub only kub nothing special
+			document.getElementById("demo2").innerHTML = chordBank;
 		}
-		
+		//end convert
 		
 	};
+	
+	//[HarmonyChecker] HarmonyCheck
+	function checkParallel(line1, line2){
+		
+		var str = "";
+		if(line1 == bass && line2 == tenor){
+			str = "B&T"
+		}else if(line1 == bass && line2 == alto){
+			str = "B&A"
+		}else if(line1 == bass && line2 == soprano){
+			str = "B&S"
+		}else if(line1 == tenor && line2 == alto){
+			str = "T&A"
+		}else if(line1 == tenor && line2 == soprano){
+			str = "T&S"
+		}else if(line1 == alto && line2 == soprano){
+			str = "A&S"
+		}
+		
+		for (var i = 0; i < bass.length; i++) {
+			if(noteNum(line2[i]) - noteNum(line1[i]) == 7){
+				/***console.log("Fifth found [case 1] > " + line2[i] + " and " + line1[i]);***/
+				if(noteNum(line2[i+1]) - noteNum(line1[i+1]) == 7){
+					warnParallel(5, line1[i], line2[i], line1[i+1], line2[i+1],str);
+					//TODO insert line
+				}
+			}else if(noteNum(line2[i]) - noteNum(line1[i]) == 12){
+				if(noteNum(line2[i+1]) - noteNum(line1[i+1]) == 12){
+					warnParallel(8, line1[i], line2[i], line1[i+1], line2[i+1],str);
+				}
+			}
+		}
+	}  
 	
 	var warnParallel = function colorTrace(parallel, t1, l1, t2, l2, comment) {
 		if(parallel == 5){
 			console.log("%c[HarmonyChecker] %c!!Parallel 5th!! %c" + comment, "color:black;font-weight:bold;", "color:red;font-weight:bold;", "color:#cccccc;font-weight:normal;border: 1px solid #cccccc");
 		}else{
-			console.log("%c[HarmonyChecker] %c!!Parallel 8th!! %c" + comment, "color:black;font-weight:bold;", "color:red;font-weight:bold;", "color:#cccccc;font-weight:normal;border: 1px solid #cccccc");
+			console.log("%c[HarmonyChecker] %c!!Parallel 8th!! %c" + comment, "color:black;font-weight:bold;", "color:blue;font-weight:bold;", "color:#cccccc;font-weight:normal;border: 1px solid #cccccc");
 		}
 		
 		console.log(" >>>> " + t1 + " > " + t2);
