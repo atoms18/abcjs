@@ -1,0 +1,233 @@
+body {
+  background: #efefef;
+   font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#canvas {
+  text-align: center;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  margin: 26px auto 0;
+  padding: 24px;
+  position: relative;
+  z-index: -1;
+}
+
+/** ** * ** ** * * * * * ** *  ***/
+/*             INPUT             */
+/** ** * ** ** * * * * * ** *  ***/
+
+.drag{
+	margin: 0px;
+	padding: 0px;
+	position: fixed;
+	box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+textarea{
+	padding: 8px;
+	border: 0px solid black;
+    overflow-y: scroll;
+}
+
+.input header a {
+  background: #bd6982;
+  display: block;
+  width: 100%;
+  padding: 10px 15px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  box-sizing: border-box;
+  cursor:move;
+}
+
+.input{
+	background: bd6982;
+	padding: 0px 0px 0px 0px;
+	position: fixed;
+	transition: transform 0.1s, box-shadow 0.3s, opacity 0.3s;
+}
+
+/** ** * ** ** * * * * * ** *  ***/
+/*            OUTPUT             */
+/** ** * ** ** * * * * * ** *  ***/
+
+.output {
+	float: right;
+	background: white;
+	width:130px;
+}
+
+.chat {
+  background: #ffffff;
+  width: 300px;
+  margin: 0 auto;
+  position: fixed;
+}
+.chat header {
+  background: #bd6982;
+  padding: 10px 15px;
+  color: #ffffff;
+  font-size: 14px;
+  cursor: move;
+}
+.chat header:before,
+.chat header:after {
+  display: block;
+  content: '';
+  clear: both;
+}
+.chat header h2,
+.chat .body ul li .content h3 {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  float: left;
+}
+.chat header h2 a {
+  color: #ffffff;
+  text-decoration: none;
+}
+.chat header .tools {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  float: right;
+}
+.chat header .tools li {
+  display: inline-block;
+  margin-right: 6px;
+}
+.chat header .tools li:last-child {
+  margin: 0;
+}
+.chat header .tools li a {
+  color: #ffffff;
+  text-decoration: none;
+  -webkit-transition: all 0.3s linear 0s;
+  -moz-transition: all 0.3s linear 0s;
+  -ms-transition: all 0.3s linear 0s;
+  -o-transition: all 0.3s linear 0s;
+  transition: all 0.3s linear 0s;
+}
+.chat .body {
+  position: relative;
+  max-height: 360px;
+  overflow-y: scroll;
+}
+.chat .body .search {
+  display: none;
+  width: 100%;
+}
+.chat .body .search.opened {
+  display: block;
+}
+.chat .body .search input {
+  width: 100%;
+  margin: 0;
+  padding: 10px 15px;
+  border: none;
+  -webkti-box-size: border-box;
+  -moz-box-size: border-box;
+  box-size: border-box;
+}
+.chat .body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid #f2f2f2;
+}
+.chat .body ul li {
+  position: relative;
+  background: #ffffff;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+.chat .body ul li:before,
+.chat .body ul li:after {
+  display: block;
+  content: '';
+  clear: both;
+}
+.chat .body ul li:hover .thumbnail {
+  background: #bd6982;
+}
+.chat .body ul li:nth-child(2n) {
+  background: #f2f2f2;
+}
+.chat .body ul li .thumbnail {
+  display: inline-block;
+  background: #bfbfbf;
+  width: 50px;
+  color: #ffffff;
+  line-height: 50px;
+  text-align: center;
+  text-decoration: none;
+  -webkit-transition: background 0.3s linear 0s;
+  -moz-transition: background 0.3s linear 0s;
+  -ms-transition: background 0.3s linear 0s;
+  -o-transition: background 0.3s linear 0s;
+  transition: background 0.3s linear 0s;
+}
+.chat .body ul li .thumbnail img {
+  width: 100%;
+}
+.chat .body ul li .content {
+  display: inline-block;
+  margin-left: 6px;
+  vertical-align: top;
+  line-height: 1;
+}
+.chat .body ul li .content h3 {
+  display: block;
+  width: 100%;
+  margin-bottom: 5px;
+  color: #808080;
+}
+.chat .body ul li .content .preview {
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin-bottom: 5px;
+  color: #cccccc;
+  font-size: 12px;
+}
+.chat .body ul li .content .meta {
+  color: #b3b3b3;
+  font-size: 12px;
+}
+.chat .body ul li .content .meta a {
+  color: #999999;
+  text-decoration: none;
+}
+.chat .body ul li .content .meta a:hover {
+  text-decoration: underline;
+}
+.chat .body ul li .message {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+}
+footer a {
+  background: #bd6982;
+  display: block;
+  width: 100%;
+  padding: 5px 15px;
+  color: #ffffff;
+  font-size: 14px;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
