@@ -37,10 +37,6 @@ window.ABCJS.parse.Parse = function() {
 	var tenor = [];
 	var bass = [];
 	
-	//ATOM please add danger here kub 
-	var addDangerStart = [];
-	var addDangerEnd = [];
-	
 	var sharpKeys = ["C","G","D","A","E","B","F#","C#"];
 	var flatKeys = ['Bb','Eb','Ab','Db','Gb','Cb','Fb'];
 	
@@ -1627,20 +1623,8 @@ window.ABCJS.parse.Parse = function() {
 								el.duration = durationOfMeasure(multilineVars);
 							}
 							
-							//[HarmonyChecker] run parallel check function 6 times
-							document.getElementById('output').innerHTML = '';
-							if((soprano.length + alto.length + tenor.length + bass.length)/4  == soprano.length){
-								checkParallel(bass,tenor);
-								checkParallel(bass,alto);
-								checkParallel(bass,soprano);
-								checkParallel(tenor,alto);
-								checkParallel(tenor,soprano);
-								checkParallel(alto,soprano);
-							}
-							//
-							
 							multilineVars.addFormattingOptions(el, tune.formatting, 'note');
-							tune.appendElement('note', startOfLine+startI, startOfLine+i, el, addDangerStart, addDangerEnd);
+							tune.appendElement('note', startOfLine+startI, startOfLine+i, el);
 							multilineVars.measureNotEmpty = true;
 							el = {};
 						}
@@ -1654,6 +1638,15 @@ window.ABCJS.parse.Parse = function() {
 				}
 			}
 		}
+		
+		//[HarmonyChecker] run parallel check function 6 times
+		checkParallel(bass,tenor);
+		checkParallel(bass,alto);
+		checkParallel(bass,soprano);
+		checkParallel(tenor,alto);
+		checkParallel(tenor,soprano);
+		checkParallel(alto,soprano);
+		//
 	};
 	
 	//[HarmonyChecker] HarmonyCheck
@@ -1674,8 +1667,7 @@ window.ABCJS.parse.Parse = function() {
 			str = "A-S"
 		}
 		
-		for (var i = 0; i < bass.length; i++) {
-			if(upper2 !== undefined || lower2 !== undefined )break;
+		for (var i = 0; i < bass.length - 1; i++) {
 			var upper1 = noteNum(lineUp[i].pitches[0].pitch,lineUp[i].pitches[0].accidental);
 			var lower1 = noteNum(lineLo[i].pitches[0].pitch,lineLo[i].pitches[0].accidental);
 			var upper2 = noteNum(lineUp[i+1].pitches[0].pitch,lineUp[i+1].pitches[0].accidental);
@@ -1684,18 +1676,18 @@ window.ABCJS.parse.Parse = function() {
 			if((upper1 - lower1) %12  == 7){
 				if((upper2 - lower2) %12 == 7){
 					warnParallel(5, toReadableNote(upper1), toReadableNote(lower1), toReadableNote(upper2), toReadableNote(lower2),str);
-					addDangerStart.push(lineUp[i]);
-					addDangerStart.push(lineLo[i]);
-					addDangerEnd.push(lineUp[i+1]);
-					addDangerEnd.push(lineLo[i+1]);
+					lineUp[i].startDanger = 1;
+					lineUp[i+1].endDanger = 1;
+					lineLo[i].startDanger = 1;
+					lineLo[i+1].endDanger = 1;
 				}
 			}else if((upper1 - lower1) %12 == 0){
 				if((upper2 - lower2) %12 == 0){
 					warnParallel(8, toReadableNote(upper1), toReadableNote(lower1), toReadableNote(upper2), toReadableNote(lower2),str);
-					addDangerStart.push(lineUp[i]);
-					addDangerStart.push(lineLo[i]);
-					addDangerEnd.push(lineUp[i+1]);
-					addDangerEnd.push(lineLo[i+1]);
+					lineUp[i].startDanger = 1;
+					lineUp[i+1].endDanger = 1;
+					lineLo[i].startDanger = 1;
+					lineLo[i+1].endDanger = 1;
 				}
 			}
 		}
